@@ -4,7 +4,8 @@ This code has been redesigned to add Specgram.  [Reference](https://github.com/m
 
 
 
-### Purpose of this Code  : FFT-and-Specgram plotting of Real Time Audio data
+### Purpose of this Code 
+FFT-and-Specgram plotting of Real Time Audio data
 
 
 ### RealTime-Audio-FFT-and-Specgram.py
