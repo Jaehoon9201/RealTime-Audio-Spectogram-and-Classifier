@@ -12,6 +12,9 @@ FFT-and-Specgram plotting of Real Time Audio data
 The following result shows the result of this code with microphone connected to PC.
 Sine wave audio for testing is avalable on this [site](https://www.szynalski.com/tone-generator/)
 
+### :bulb: Setting
+![setting](https://user-images.githubusercontent.com/71545160/127726744-46da19d9-0336-4649-b57f-936de65c2f91.png)
+
 ### :bulb: Real time audio data and FFT of it
 ![realtime fft](https://user-images.githubusercontent.com/71545160/127726420-a8373ab5-8496-4d80-b162-59b53dd2c3cb.png)
 ### :bulb: Spectogram
