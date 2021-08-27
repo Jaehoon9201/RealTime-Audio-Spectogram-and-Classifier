@@ -19,12 +19,8 @@ from matplotlib.colors import LogNorm
 
 import csv
 
-# ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-# ■■■■■■■■■■■ Saving Audio ■■■■■■■■■■
-# ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 # constants
-CHUNK = 1024*32  # samples per frame
 CHUNK = 44100*2  # samples per frame
 FORMAT = pyaudio.paFloat32   # audio format (bytes per sample?)
 CHANNELS = 1  # single channel for microphone
@@ -32,7 +28,6 @@ RATE = 44100  # samples per second
 ClassID = 0  # 0 : Normal
 # create matplotlib figure and axes
 fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 4))
-
 fig2, ax3 = plt.subplots(1, figsize=(6, 6))
 ax3.set_title('Spectrogram (dB)')
 ax3.set_xlabel('Time')
@@ -79,6 +74,9 @@ print('stream started')
 frame_count = 0
 start_time = time.time()
 ctr = 0
+# ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+# ■■■■■■■■■■■■■ Saving AudioFiles with plotting the FFT and SPECTOGRAM■■■■■■■■■■■■
+# ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 # Saving Class IDs on the CSV file
 f = open("acquired_data/AudioName-ClassID.csv", "w", encoding="UTF-8")
@@ -115,38 +113,20 @@ while True:
     im_data = im.get_array()
 
     # SAVE DATA
-    #if (ctr % 5 == 0):
     ipd.Audio(data_np, rate=RATE)  # load a NumPy array
     sf.write('acquired_data/Data Num %d ClassID %d.wav' % (ctr, ClassID), data_np, RATE, 'PCM_24')
     f = open("acquired_data/AudioName-ClassID.csv", "a", encoding="UTF-8", newline='')  # not a "w" mode !
     f.write('%d' %(ctr)+','+ 'Data Num %d ClassID %d.wav' % (ctr, ClassID) + ',' + ' %d' % (ClassID)+ '\n')
     f.close()
-    # update figure canvas
+
     try:
         # DISPLAY REAL TIME FFT
         fig.canvas.draw()
         fig.canvas.flush_events()
         frame_count += 1
-
-        # # DISPLAY SPECTGRAM - ver1
-        # if (ctr % 1 == 0):
-        #     if ctr < 2: # for init
-        #         im_data = np.hstack((im_data, arr2D))
-        #         im.set_array(im_data)
-        #     else:
-        #         keep_block = arr2D.shape[1] * (64 - 1)
-        #         im_data = np.delete(im_data, np.s_[:-keep_block], 1)
-        #         im_data = np.hstack((im_data, arr2D))
-        #         im.set_array(im_data)
-        #     fig2.canvas.draw()
-        # ctr += 1
-
-        # DISPLAY SPECTGRAM  - ver2
-        #im_data = np.hstack((im_data, arr2D))
         im.set_array(im_data)
         fig2.canvas.draw()
         ctr += 1
-
         plt.pause(0.4)
 
 
