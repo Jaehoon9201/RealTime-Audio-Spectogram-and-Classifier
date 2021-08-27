@@ -1,3 +1,21 @@
+## RealTimeAudio-FFT-SPECGRAM-AQ.py
+It's a newly updated code from the below file(RealTime-Audio-FFT-and-Specgram).
+It's also based on the [Reference](https://github.com/markjay4k/Audio-Spectrum-Analyzer-in-Python).
+
+### what is different with below one
+:bulb: More optimized. It shows the data acquired during 2 seconds.
+:bulb: It saves the audio file obtained during 2 seconds. It also makes a list of the saved files.
+
+## Results
+![image](https://user-images.githubusercontent.com/71545160/131115427-42a692a5-26a9-449a-95f6-bc3a8e57121d.png)
+
+![image](https://user-images.githubusercontent.com/71545160/131115437-8284c60d-74ca-435f-9f7a-5e3d364d4658.png)
+
+![image](https://user-images.githubusercontent.com/71545160/131115481-ddfcd4a7-e98d-412a-be42-ddda25dcb752.png)
+
+![image](https://user-images.githubusercontent.com/71545160/131115514-78c40053-4903-4be2-93a7-543c81b900de.png)
+
+
 ## RealTime-Audio-FFT-and-Specgram
 This code has been redesigned to add Specgram.  [Reference](https://github.com/markjay4k/Audio-Spectrum-Analyzer-in-Python)
 
