@@ -95,7 +95,6 @@ while True:
 
     # compute FFT and update line
     yf = fft(data_int)
-    #line_fft.set_ydata(np.abs(yf[0:CHUNK]) / (128 * CHUNK))
     line_fft.set_ydata(np.abs(yf[0:CHUNK]) / CHUNK)
 
     # SPECTGRAM
