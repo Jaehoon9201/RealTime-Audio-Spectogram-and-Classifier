@@ -7,6 +7,8 @@ It's also based on the [Reference](https://github.com/markjay4k/Audio-Spectrum-A
 
 :bulb: It saves the audio file obtained during 2 seconds. It also makes a list of the saved files.
 
+:bulb: Data type of 'Buffer' is changed to 'float'.
+
 ## Results
 ![image](https://user-images.githubusercontent.com/71545160/131115427-42a692a5-26a9-449a-95f6-bc3a8e57121d.png)
 
