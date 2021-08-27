@@ -4,6 +4,7 @@ It's also based on the [Reference](https://github.com/markjay4k/Audio-Spectrum-A
 
 ### what is different with below one
 :bulb: More optimized. It shows the data acquired during 2 seconds.
+
 :bulb: It saves the audio file obtained during 2 seconds. It also makes a list of the saved files.
 
 ## Results
