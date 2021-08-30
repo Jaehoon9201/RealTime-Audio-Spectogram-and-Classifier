@@ -21,7 +21,8 @@ import csv
 
 
 # constants
-CHUNK = 44100*2  # samples per frame
+DATA_AQ_TIME = 2
+CHUNK = 44100*DATA_AQ_TIME  # samples per frame
 FORMAT = pyaudio.paFloat32   # audio format (bytes per sample?)
 CHANNELS = 1  # single channel for microphone
 RATE = 44100  # samples per second
