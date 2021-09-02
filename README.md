@@ -26,7 +26,7 @@ Sine wave audio for testing is avalable on this [site](https://www.szynalski.com
 ![image](https://user-images.githubusercontent.com/71545160/131115514-78c40053-4903-4be2-93a7-543c81b900de.png)
 
 
-# Audio-DL-Simple-Classifier-NVH.py
+# Audio-DL-Simple-Classifier.py
 After acquisitioning data with RealTimeAudio-FFT-SPECGRAM-AQ.py,
 
 We can train a model which can classify the real-time audio data coming from serial data.
