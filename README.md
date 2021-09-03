@@ -31,6 +31,8 @@ We can train a model which can classify the real-time audio data coming from ser
 
 This code is for the training the classifier.
 
+Data domain is transformed to frequency domain using a spectogram. It helps the model to be learned easily.
+
 If you want to watch the trained spectogram figure, activate the below code on the file.
 
 ```python
@@ -45,4 +47,11 @@ If you want to watch the trained spectogram figure, activate the below code on t
 
 ### Results
 ![image](https://user-images.githubusercontent.com/71545160/131941710-311b98b4-3029-4825-a6ee-01d20b4829db.png)
+
+# ▶Audio-DL-MelSpecto-Classifier.py
+This code is also based on the [Reference](https://towardsdatascience.com/audio-deep-learning-made-simple-sound-classification-step-by-step-cebc936bbe5)
+
+Data domain is transformed to frequency domain using a Melspectogram.
+
+
 
