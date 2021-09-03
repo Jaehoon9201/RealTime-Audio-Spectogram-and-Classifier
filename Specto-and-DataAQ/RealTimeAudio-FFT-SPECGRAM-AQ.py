@@ -1,3 +1,7 @@
+# Reference : https://github.com/markjay4k/Audio-Spectrum-Analyzer-in-Python
+# Based on the above reference code, Histogram is added by Jaehoon Shim, 2021-07-31
+# Reference code is also revised to float-type data and added plt.pause function
+
 import librosa
 import matplotlib.pyplot as plt
 import librosa.display
