@@ -1,6 +1,5 @@
 # ▶RealTimeAudio-FFT-SPECGRAM-AQ.py
-It's a newly updated code from the below file(RealTime-Audio-FFT-and-Specgram).
-It's also based on the [Reference](https://github.com/markjay4k/Audio-Spectrum-Analyzer-in-Python).
+This code is based on the [Reference](https://github.com/markjay4k/Audio-Spectrum-Analyzer-in-Python).
 ### [RealTime-Audio-FFT-and-Specgram.py]
 1. More optimized. It shows the data acquired during 4 seconds.
 2. It saves the audio file obtained during 4 seconds. It also makes a list of the saved files. It could be used for training a audio-classifier.
@@ -24,6 +23,8 @@ Sine wave audio for testing is avalable on this [site](https://www.szynalski.com
 
 
 # ▶Audio-DL-Simple-Classifier.py
+This code is based on the [Reference](https://towardsdatascience.com/audio-deep-learning-made-simple-sound-classification-step-by-step-cebc936bbe5)
+
 After acquisitioning data with RealTimeAudio-FFT-SPECGRAM-AQ.py,
 
 We can train a model which can classify the real-time audio data coming from serial data.
