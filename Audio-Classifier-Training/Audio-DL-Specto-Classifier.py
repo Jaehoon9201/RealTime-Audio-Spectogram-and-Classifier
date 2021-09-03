@@ -1,3 +1,6 @@
+# This code is based on the 
+# [Reference](https://towardsdatascience.com/audio-deep-learning-made-simple-sound-classification-step-by-step-cebc936bbe5)
+
 # coding=<utf-8>
 import pandas as pd
 from pathlib import Path
