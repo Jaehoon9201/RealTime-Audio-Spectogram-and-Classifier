@@ -1,6 +1,4 @@
 # coding=<utf-8>
-
-
 import pandas as pd
 from pathlib import Path
 import math, random
@@ -14,7 +12,6 @@ from torch.utils.data import DataLoader, Dataset, random_split
 import torchaudio
 from torch.utils.data import random_split
 
-
 import torch.nn.functional as F
 from torch.nn import init
 import torch.nn as nn
@@ -24,11 +21,10 @@ import librosa
 import librosa.display
 
 from matplotlib import pyplot as plt
+from matplotlib.mlab import window_hanning, specgram
+from matplotlib.colors import LogNorm
+
 import tensorflow as tf
-
-
-
-
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 # Read csv data file
 train_csvdata_file = 'data/train_class.csv'
@@ -46,8 +42,6 @@ train_df = train_df.loc[:, ['relative_path', 'classID']]
 test_df = test_df.values[1:, :]
 test_df = pd.DataFrame(test_df, columns = ['cnt', 'classID', 'relative_path'])
 test_df = test_df.loc[:, ['relative_path', 'classID']]
-
-
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 class AudioUtil():
   # ----------------------------
@@ -57,7 +51,6 @@ class AudioUtil():
   def open(audio_file):
     sig, sr = torchaudio.load(audio_file)
     return (sig, sr)
-
   # ----------------------------
   # Convert the given audio to the desired number of channels
   # ----------------------------
@@ -77,33 +70,19 @@ class AudioUtil():
       resig = torch.cat([sig, sig])
 
     return ((resig, sr))
-
-
- 
   # ----------------------------
   # Generate a Spectrogram
   # ----------------------------
   @staticmethod
-  def spectro_gram(aud, n_mels=64, n_fft=1024, hop_len=None):
+  def spectro_gram(aud, n_fft=1024, hop_len=512):
     sig,sr = aud
-    top_db = 80
-
-    # spec has shape [channel, n_mels, time], where channel is mono, stereo etc
-    spec = transforms.MelSpectrogram(sr, n_fft=n_fft, hop_length=hop_len, n_mels=n_mels)(sig)
-
-    # Convert to decibels
+    top_db = 100
+    spec = transforms.Spectrogram(n_fft=n_fft, hop_length=hop_len)(sig)
     spec = transforms.AmplitudeToDB(top_db=top_db)(spec)
+
     return (spec)
 
-    # ----------------------------
-    # Augment the Spectrogram by masking out some sections of it in both the frequency
-    # dimension (ie. horizontal bars) and the time dimension (vertical bars) to prevent
-    # overfitting and to help the model generalise better. The masked sections are
-    # replaced with the mean value.
-    # ----------------------------
-
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-
 # ----------------------------
 # train_Sound Dataset
 # ----------------------------
@@ -111,10 +90,8 @@ class train_SoundData(Dataset):
     def __init__(self, df, data_path):
         self.df = df
         self.data_path = str(data_path)
-        self.duration = 4000
         self.sr = 44100
         self.channel = 2
-        self.shift_pct = 0.4
 
     # ----------------------------
     # Number of items in dataset
@@ -131,11 +108,9 @@ class train_SoundData(Dataset):
         class_id = self.df.loc[idx, 'classID']
         aud_data = AudioUtil.open(audio_file)
         rechanneled = AudioUtil.rechannel(aud_data, self.channel)
-        spectrogram = AudioUtil.spectro_gram(rechanneled, n_mels=64, n_fft=1024, hop_len=None)
+        spectrogram = AudioUtil.spectro_gram(rechanneled, n_fft=1024, hop_len=512)
         
-
         return spectrogram, class_id
-
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 # ----------------------------
 # test_Sound Dataset
@@ -144,10 +119,8 @@ class test_SoundData(Dataset):
     def __init__(self, df, data_path):
         self.df = df
         self.data_path = str(data_path)
-        self.duration = 4000
         self.sr = 44100
         self.channel = 2
-        self.shift_pct = 0.4
 
     # ----------------------------
     # Number of items in dataset
@@ -164,16 +137,10 @@ class test_SoundData(Dataset):
         class_id = self.df.loc[idx, 'classID']
         aud_data = AudioUtil.open(audio_file)
         rechanneled = AudioUtil.rechannel(aud_data, self.channel)
-        spectrogram = AudioUtil.spectro_gram(rechanneled, n_mels=64, n_fft=1024, hop_len=None)
+        spectrogram = AudioUtil.spectro_gram(rechanneled, n_fft=1024, hop_len=512)
         
-
         return spectrogram, class_id
-
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-
-
-
-
 # ----------------------------
 # Audio Classification Model
 # ----------------------------
@@ -240,21 +207,28 @@ class AudioClassifier(nn.Module):
 
         # Final output
         return x
-
-
-
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-
-
+def plot_spectrogram(data, title=None, ylabel='freq_bin', aspect='auto', xmax=None):
+  fig, axs = plt.subplots(1, 1)
+  axs.set_title('Spectrogram (db)')
+  axs.set_ylabel(ylabel)
+  axs.set_xlabel('frame')
+  im = axs.imshow(data, cmap='viridis', aspect=aspect)
+  # cmap='viridis', 'viridis_r', 'inferno', 'inferno_r', 'plasma', plt.cm.Blues, plt.cm.Blues_r, 'BrBG', 'BrBG_r'
+  if xmax:
+    axs.set_xlim((0, xmax))
+  fig.colorbar(im, ax=axs)
+  plt.show()
+#■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 # ----------------------------
-# Training Loop
+# Training 
 # ----------------------------
-def training(model, train_dl, num_epochs):
+def training(model, train_dataset, num_epochs):
     # Loss Function, Optimizer and Scheduler
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.001,
-                                                    steps_per_epoch=int(len(train_dl)),
+                                                    steps_per_epoch=int(len(train_dataset)),
                                                     epochs=num_epochs,
                                                     anneal_strategy='linear')
 
@@ -265,10 +239,9 @@ def training(model, train_dl, num_epochs):
         total_prediction = 0
 
         # Repeat for each batch in the training set
-        for i, data in enumerate(train_dl):
+        for i, data in enumerate(train_dataset):
             # Get the input features and target labels, and put them on the GPU
             inputs, labels = data[0].to(device), data[1].to(device)
-
             # Normalize the inputs
             inputs_m, inputs_s = inputs.mean(), inputs.std()
             inputs = (inputs - inputs_m) / inputs_s
@@ -301,37 +274,29 @@ def training(model, train_dl, num_epochs):
             #     temp_data = data[0].to(device)
             #     temp_data_array = temp_data[0,0,:,:].cpu().data.numpy()
 
-            #     print(temp_data[0,0,:,:])  
-            #     print(temp_data[0,0,:,:].cpu().data.numpy()) 
-            #     print(temp_data_array.shape)
-            #     print(temp_data_array[:,-1])
+            #     plot_spectrogram(temp_data_array, title=None, ylabel='freq_bin', aspect='auto', xmax=None)
 
-            #     plt.plot(temp_data_array[:,-1])
-            #     plt.show()
-            #     plt.imshow(temp_data_array, cmap='viridis', aspect='auto') # cmap='viridis', 'viridis_r', 'inferno', 'inferno_r', 'plasma', plt.cm.Blues, plt.cm.Blues_r, 'BrBG', 'BrBG_r'
-            #     plt.show()
             # ■■■■■■■■■■
             # ■■■■■■■■■■
             # ■■■■■■■■■■
         # Print stats at the end of the epoch
-        num_batches = len(train_dl)
+        num_batches = len(train_dataset)
         avg_loss = running_loss / num_batches
         acc = correct_prediction / total_prediction
         print(f'Epoch: {epoch}, Loss: {avg_loss:.2f}, Accuracy: {acc:.2f}')
 
     print('Finished Training')
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-
 # ----------------------------
 # Testing
 # ----------------------------
-def testing(model, test_dl):
+def testing(model, test_dataset):
     correct_prediction = 0
     total_prediction = 0
 
     # Disable gradient updates
     with torch.no_grad():
-        for data in test_dl:
+        for data in test_dataset:
             # Get the input features and target labels, and put them on the GPU
             inputs, labels = data[0].to(device), data[1].to(device)
 
@@ -350,38 +315,31 @@ def testing(model, test_dl):
 
     acc = correct_prediction / total_prediction
     print(f'Accuracy: {acc:.2f}, Total items: {total_prediction}')
-
-
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 #■■■■■■■■■■■■■  Main  ■■■■■■■■■■■■■■■
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-
-
 # Create the model and put it on the GPU if available
+num_epochs = 40  
+batchsize = 16
+
 myModel = AudioClassifier()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 myModel = myModel.to(device)
+
 # Check that it is on Cuda
 next(myModel.parameters()).device
-
-
-train_ds = train_SoundData(train_df, train_data_path)
-test_ds = test_SoundData(test_df, test_data_path)
-
-
+train_data = train_SoundData(train_df, train_data_path)
+test_data = test_SoundData(test_df, test_data_path)
 
 # Create training and validation data loaders
 print('data loading- start')
-train_dl = torch.utils.data.DataLoader(train_ds, batch_size=16, shuffle=True)
-test_dl = torch.utils.data.DataLoader(test_ds, batch_size=16, shuffle=False)
+train_dataset = torch.utils.data.DataLoader(train_data, batch_size=batchsize, shuffle=True)
+test_dataset = torch.utils.data.DataLoader(test_data, batch_size=batchsize, shuffle=False)
 print('data loading- finished')
 
-
-num_epochs = 40  
 print('Starting Training')
-training(myModel, train_dl, num_epochs)
-testing(myModel, test_dl)
-
+training(myModel, train_dataset, num_epochs)
+testing(myModel, test_dataset)
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 #■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
